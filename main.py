@@ -21,12 +21,14 @@ MODEL = "gemini-2.5-flash"
 SYSTEM_PROMPT = """You are an expert technical writer who creates clear, concise, and high-level article summaries.
 
 Your task:
+- You will be provided with the article text and a list of possible titles. Determine the best, most accurate title for the article.
+- Start your response with the title formatted as a level 1 heading (e.g., `# The Actual Title`) on the very first line.
 - Create a short, high-level overview of the provided article. Do NOT output too much text and do not leave any topic.
 - Use simple, easy-to-understand language.
 - Provide a brief "Overview" section capturing the core idea.
 - Only include the most critical points using proper headings. Do NOT output granular details.
 - Do NOT overuse bullet points and NEVER use tables.
-- Output ONLY the summary in Markdown format. Do not include any preamble like "Here is the summary".
+- Output ONLY the summary in Markdown format. Do not include any preamble.
 """
 
 # ── Step 1: Interactive CLI Menu ─────────────────────────────────────────────
@@ -95,9 +97,15 @@ def extract_from_url(url):
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # Extract title
-    title_tag = soup.find("title")
-    title = title_tag.get_text(strip=True) if title_tag else "Untitled Article"
+    # Extract titles to let Gemini decide the best one
+    title_tags = soup.find_all(["title", "h1"])
+    possible_titles = []
+    seen_titles = set()
+    for t in title_tags:
+        t_text = t.get_text(strip=True)
+        if t_text and t_text not in seen_titles:
+            possible_titles.append(t_text)
+            seen_titles.add(t_text)
 
     # Extract article body — try <article> first, then fall back to all <p> tags
     article = soup.find("article")
@@ -118,7 +126,10 @@ def extract_from_url(url):
         # Last resort — grab all visible text
         body_text = soup.get_text(separator="\n", strip=True)
 
-    return title, body_text
+    if possible_titles:
+        body_text = "Possible Titles:\n" + "\n".join(f"- {t}" for t in possible_titles) + "\n\nArticle Text:\n" + body_text
+
+    return "Let Gemini Decide", body_text
 
 
 def extract_content(input_type, input_value):
@@ -291,6 +302,13 @@ def main():
     # Step 3: Summarize with Gemini
     summary = summarize_with_gemini(body_text)
     print("\nSummary generated successfully!\n")
+
+    # Parse the title from the first line of the summary
+    first_line = summary.split("\n")[0].strip()
+    if first_line.startswith("# "):
+        title = first_line.replace("# ", "", 1).strip()
+        # Remove the first line (the title) from the summary body
+        summary = "\n".join(summary.split("\n")[1:]).strip()
 
     # Step 4: Save to notes.md
     append_summary(title, source_url, summary)
