@@ -7,6 +7,7 @@
 <!-- INDEX START -->
 - [Latency, Throughput And Availability](#latency-throughput-and-availability) — *2026-08-06 01:28*
 - [Horizontal and Vertical Scaling | System Design](#horizontal-and-vertical-scaling-system-design) — *2026-08-06 01:44*
+- [Describe the CAP theorem and its implications for distributed systems](#describe-the-cap-theorem-and-its-implications-for-distributed-systems) — *2026-08-07 19:41*
 <!-- INDEX END -->
 
 ---
@@ -74,5 +75,36 @@ Horizontal scaling involves adding more servers or machines to a system and dist
 
 ## Choosing a Scaling Approach
 The decision between horizontal and vertical scaling, or often a hybrid approach, depends on specific system requirements, business goals, and architectural considerations. Many large organizations combine aspects of both to leverage the speed and consistency of vertical scaling with the resilience and extensive scalability of horizontal scaling.
+
+---
+
+## Describe the CAP theorem and its implications for distributed systems
+
+*Added: 2026-08-07 19:41*
+
+**Source:** [https://www.geeksforgeeks.org/data-engineering/describe-the-cap-theorem-and-its-implications-for-distributed-systems/](https://www.geeksforgeeks.org/data-engineering/describe-the-cap-theorem-and-its-implications-for-distributed-systems/)
+
+## Overview
+The CAP theorem is a foundational principle in distributed systems, stating that it's impossible for a distributed data store to simultaneously guarantee Consistency, Availability, and Partition Tolerance. This theorem guides system designers in making essential trade-offs based on their application's specific needs.
+
+## Understanding the CAP Theorem
+Introduced by Eric Brewer, the CAP theorem defines three core properties for distributed systems:
+
+*   **Consistency (C):** Ensures that every read operation receives the most recent write, meaning all nodes in the system see the same data at the same time.
+*   **Availability (A):** Guarantees that every request receives a response, even if some nodes fail, ensuring the system remains operational.
+*   **Partition Tolerance (P):** Means the system continues to function despite network failures that split the system into isolated groups of nodes.
+
+## The Incompatibility of CAP
+The theorem asserts that a distributed system can only achieve two out of these three properties at any given time. This forces designers to choose between:
+
+*   **CP (Consistency and Partition Tolerance):** Systems prioritize data accuracy and can handle network partitions, but may become unavailable during a partition.
+*   **AP (Availability and Partition Tolerance):** Systems prioritize continuous operation and can handle network partitions, but may return outdated data, sacrificing immediate consistency.
+*   **CA (Consistency and Availability):** While theoretically possible, this combination is impractical in real-world distributed systems because network partitions are inevitable.
+
+## Practical Implications
+The CAP theorem profoundly impacts the design of distributed systems:
+
+*   **Design Trade-offs:** Designers must decide whether consistency (e.g., financial transactions) or availability (e.g., online retail) is more critical, as partition tolerance is often a mandatory requirement in distributed environments.
+*   **Eventual Consistency:** Many systems adopt eventual consistency, where data will eventually become consistent across all nodes over time, balancing availability with a relaxed form of consistency. Examples include Apache Cassandra (AP) and Apache HBase (CP).
 
 ---
