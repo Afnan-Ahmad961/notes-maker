@@ -8,6 +8,7 @@
 - [Latency, Throughput And Availability](#latency-throughput-and-availability) — *2026-08-06 01:28*
 - [Horizontal and Vertical Scaling | System Design](#horizontal-and-vertical-scaling-system-design) — *2026-08-06 01:44*
 - [Describe the CAP theorem and its implications for distributed systems](#describe-the-cap-theorem-and-its-implications-for-distributed-systems) — *2026-08-07 19:41*
+- [PACELC Theorem](#pacelc-theorem) — *2026-08-08 00:23*
 <!-- INDEX END -->
 
 ---
@@ -106,5 +107,28 @@ The CAP theorem profoundly impacts the design of distributed systems:
 
 *   **Design Trade-offs:** Designers must decide whether consistency (e.g., financial transactions) or availability (e.g., online retail) is more critical, as partition tolerance is often a mandatory requirement in distributed environments.
 *   **Eventual Consistency:** Many systems adopt eventual consistency, where data will eventually become consistent across all nodes over time, balancing availability with a relaxed form of consistency. Examples include Apache Cassandra (AP) and Apache HBase (CP).
+
+---
+
+## PACELC Theorem
+
+*Added: 2026-08-08 00:23*
+
+**Source:** [https://www.geeksforgeeks.org/operating-systems/pacelc-theorem/](https://www.geeksforgeeks.org/operating-systems/pacelc-theorem/)
+
+## Overview
+The PACELC Theorem is an extension of the CAP Theorem, designed to address its limitations by incorporating latency as a critical factor in distributed system design. It provides a framework for making tradeoffs not only during network partitions but also under normal operating conditions.
+
+## Key Concept
+The PACELC theorem states that in the event of a **P**artition, a distributed system must choose between **A**vailability and **C**onsistency (P/A or P/C). **E**lse, if there is no partition, the system must choose between **L**atency and **C**onsistency (L/C). This means designers must consider two sets of tradeoffs depending on whether a network partition exists.
+
+## Addressing CAP Theorem's Limitations
+The original CAP Theorem did not account for performance or latency when a distributed system was functioning normally (without a network partition). PACELC fills this gap by highlighting that even without partitions, systems must balance the speed of response (latency) with the guarantee of data accuracy (consistency). High latency, even if a system is technically "available," can make it unusable in real-world applications.
+
+## Benefits
+The PACELC Theorem offers several advantages:
+*   It explicitly considers the crucial tradeoffs between latency and consistency that are always present in distributed systems.
+*   It provides a more comprehensive model for designing and choosing appropriate distributed systems.
+*   It overcomes a major limitation of the CAP Theorem by addressing system behavior during normal operation, not just during failures.
 
 ---
