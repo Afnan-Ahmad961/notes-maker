@@ -10,6 +10,7 @@
 - [Describe the CAP theorem and its implications for distributed systems](#describe-the-cap-theorem-and-its-implications-for-distributed-systems) — *2026-08-07 19:41*
 - [PACELC Theorem](#pacelc-theorem) — *2026-08-08 00:23*
 - [How DNS Works: A Guide to Understanding the Internet's Address Book](#how-dns-works-a-guide-to-understanding-the-internets-address-book) — *2026-08-08 01:40*
+- [Content Distribution Network (CDN)](#content-distribution-network-cdn) — *2026-08-08 01:57*
 <!-- INDEX END -->
 
 ---
@@ -155,5 +156,31 @@ Throughout this process, caching is extensively used at various levels to speed 
 
 ## Domain Registrars and New Domain Setup
 Domain registrars are entities that allow individuals and organizations to register and manage domain names. When a new domain is purchased, the registrar registers it with the appropriate registry, configures its name servers, and sets up the DNS zone file with records linking the domain to its hosting server. These changes then propagate across the global DNS network, making the domain accessible.
+
+---
+
+## Content Distribution Network (CDN)
+
+*Added: 2026-08-08 01:57*
+
+**Source:** [https://www.geeksforgeeks.org/computer-networks/what-is-a-content-distribution-network-and-how-does-it-work/](https://www.geeksforgeeks.org/computer-networks/what-is-a-content-distribution-network-and-how-does-it-work/)
+
+## Overview
+A Content Distribution Network (CDN) is a system of geographically distributed servers designed to deliver web content to users more quickly and efficiently. By storing copies of content closer to users, CDNs reduce the physical distance data travels, leading to faster load times, lower latency, and improved website performance.
+
+## Key Components
+A CDN operates through several core elements. The **Origin Server** is where the original content is hosted. **Points of Presence (PoPs)** are physical data centers located in various regions or cities. Within each PoP, **Edge Servers** directly serve user requests, holding a **Cache** of frequently accessed content. The **CDN DNS / Request Routing** system directs users to the nearest and most optimal edge server.
+
+## How a CDN Works
+When a user requests content, the CDN's DNS system routes the request to an edge server in a PoP geographically closest to the user. If the content is cached on that edge server, it's delivered immediately. If not, the edge server fetches the content from the origin server, serves it to the user, and then caches it for future requests. This process significantly shortens the data path, reducing latency and speeding up delivery.
+
+## Advantages
+CDNs offer numerous benefits, including **faster load times** and **lower latency** due to content being served from nearby locations. They **reduce the load on origin servers** by offloading traffic to edge servers and **increase availability** by distributing requests across multiple points. CDNs are also effective at **handling traffic spikes** and can lead to **lower bandwidth costs** for content providers, ultimately providing a **better user experience**.
+
+## Limitations
+Despite their advantages, CDNs have some drawbacks. They introduce **extra costs** for services. There can be challenges with **cache inconsistency**, where users might see outdated content if not managed properly. Debugging issues can be harder due to **less control at the edge**. CDNs may also be less effective for **highly dynamic content** and can have **regional gaps** in coverage. Incorrect configuration can also pose **security risks**.
+
+## Applications
+CDNs are widely used across various industries. They are crucial for **video streaming** services to ensure smooth playback and less buffering. They accelerate **website performance** by quickly delivering static assets like images and scripts. CDNs also facilitate faster **software and application downloads**, improve **gaming** experiences by speeding up updates, and enhance **e-commerce** sites by handling peak traffic. They can also improve **API response times** and provide **security at the edge** by mitigating DDoS attacks.
 
 ---
