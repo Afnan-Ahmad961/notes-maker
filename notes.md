@@ -9,6 +9,7 @@
 - [Horizontal and Vertical Scaling | System Design](#horizontal-and-vertical-scaling-system-design) — *2026-08-06 01:44*
 - [Describe the CAP theorem and its implications for distributed systems](#describe-the-cap-theorem-and-its-implications-for-distributed-systems) — *2026-08-07 19:41*
 - [PACELC Theorem](#pacelc-theorem) — *2026-08-08 00:23*
+- [How DNS Works: A Guide to Understanding the Internet's Address Book](#how-dns-works-a-guide-to-understanding-the-internets-address-book) — *2026-08-08 01:40*
 <!-- INDEX END -->
 
 ---
@@ -130,5 +131,29 @@ The PACELC Theorem offers several advantages:
 *   It explicitly considers the crucial tradeoffs between latency and consistency that are always present in distributed systems.
 *   It provides a more comprehensive model for designing and choosing appropriate distributed systems.
 *   It overcomes a major limitation of the CAP Theorem by addressing system behavior during normal operation, not just during failures.
+
+---
+
+## How DNS Works: A Guide to Understanding the Internet's Address Book
+
+*Added: 2026-08-08 01:40*
+
+**Source:** [https://www.freecodecamp.org/news/how-dns-works-the-internets-address-book/](https://www.freecodecamp.org/news/how-dns-works-the-internets-address-book/)
+
+## Overview
+The Domain Name System (DNS) is the internet's address book, translating human-readable domain names like `example.com` into numerical IP addresses that computers use to locate websites and services. This process ensures seamless navigation across the internet.
+
+## The DNS Resolution Process
+When you access a domain name, your device first checks its local caches (application and operating system) for the corresponding IP address. If not found, it forwards the request to a configured DNS server, often provided by your internet service provider or a public DNS service. This initial server then begins a recursive search across the global DNS hierarchy.
+
+## The DNS Hierarchy and Recursive Resolution
+The recursive resolver, a key component of a DNS server, orchestrates the lookup by interacting with a series of specialized servers:
+*   **Root Name Servers:** These are the top of the hierarchy, directing the resolver to the correct Top-Level Domain (TLD) server (e.g., for `.com` or `.org`). There are 13 root server clusters globally, using anycast routing for efficiency and reliability.
+*   **TLD Name Servers:** These servers manage specific TLDs and provide the resolver with the address of the authoritative name server for the requested domain.
+*   **Authoritative Name Servers:** These servers hold the definitive DNS records (like A, CNAME, MX records) for a particular domain and provide the final IP address to the recursive resolver.
+Throughout this process, caching is extensively used at various levels to speed up future queries.
+
+## Domain Registrars and New Domain Setup
+Domain registrars are entities that allow individuals and organizations to register and manage domain names. When a new domain is purchased, the registrar registers it with the appropriate registry, configures its name servers, and sets up the DNS zone file with records linking the domain to its hosting server. These changes then propagate across the global DNS network, making the domain accessible.
 
 ---
