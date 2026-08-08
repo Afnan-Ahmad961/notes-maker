@@ -11,6 +11,7 @@
 - [PACELC Theorem](#pacelc-theorem) — *2026-08-08 00:23*
 - [How DNS Works: A Guide to Understanding the Internet's Address Book](#how-dns-works-a-guide-to-understanding-the-internets-address-book) — *2026-08-08 01:40*
 - [Content Distribution Network (CDN)](#content-distribution-network-cdn) — *2026-08-08 01:57*
+- [Load Balancing Strategies: Round-Robin, Least Connections, and Consistent Hashing](#load-balancing-strategies-round-robin-least-connections-and-consistent-hashing) — *2026-08-08 19:49*
 <!-- INDEX END -->
 
 ---
@@ -182,5 +183,46 @@ Despite their advantages, CDNs have some drawbacks. They introduce **extra costs
 
 ## Applications
 CDNs are widely used across various industries. They are crucial for **video streaming** services to ensure smooth playback and less buffering. They accelerate **website performance** by quickly delivering static assets like images and scripts. CDNs also facilitate faster **software and application downloads**, improve **gaming** experiences by speeding up updates, and enhance **e-commerce** sites by handling peak traffic. They can also improve **API response times** and provide **security at the edge** by mitigating DDoS attacks.
+
+---
+
+## Load Balancing Strategies: Round-Robin, Least Connections, and Consistent Hashing
+
+*Added: 2026-08-08 19:49*
+
+## Overview
+
+Load balancers are critical components in modern distributed systems, ensuring efficient distribution of incoming network traffic across multiple servers. This article explains how load balancers enable horizontal scaling and improve system reliability by choosing the right algorithm to direct requests. It differentiates between Layer 4 and Layer 7 load balancing and details several common algorithms, highlighting their strengths and ideal use cases.
+
+## The Role of Load Balancers
+
+Load balancers distribute incoming client requests among available server instances, preventing any single server from becoming overloaded and ensuring optimal resource utilization. They are essential for scaling applications horizontally, improving performance, and maintaining high availability by directing traffic away from unhealthy instances. The choice of load balancing algorithm significantly impacts how evenly load is spread and how the system behaves under various conditions.
+
+## Layer 4 vs. Layer 7 Balancing
+
+Load balancers operate at different layers of the network stack, influencing their capabilities:
+
+*   **Layer 4 (Transport Layer):** Routes traffic based on basic network information like IP addresses and TCP/UDP ports. It's fast and efficient because it doesn't inspect the content of the request.
+*   **Layer 7 (Application Layer):** Inspects the full request content, including HTTP headers, URLs, and cookies. This allows for more intelligent routing decisions based on application-specific logic, making it common for microservices.
+
+## Common Load Balancing Algorithms
+
+Different algorithms are suited for different workloads and system requirements:
+
+### Round-Robin
+
+This is the simplest method, distributing requests sequentially to each server in the pool. It ensures an even distribution of request *counts*. A "weighted" version can be used to send more requests to servers with higher capacity. It works best for stateless services where requests are similar in processing cost.
+
+### Least Connections
+
+This algorithm directs new requests to the server with the fewest active connections. It is more adaptive than round-robin because it considers the actual load on servers, accounting for varying request durations. A "weighted" version can also be applied for servers with different capacities.
+
+### Least Response Time
+
+An advanced variant of least connections, this algorithm routes requests to the server with the fewest active connections and the lowest average response time. It helps to avoid temporarily slow instances, providing more precise load distribution.
+
+### IP Hash
+
+With IP hash, the client's IP address is used to determine which server handles the request. This ensures that requests from the same client consistently go to the same server, which is useful for maintaining session affinity without requiring the load balancer to track session state.
 
 ---
