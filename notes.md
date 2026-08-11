@@ -14,6 +14,7 @@
 - [Load Balancing Strategies: Round-Robin, Least Connections, and Consistent Hashing](#load-balancing-strategies-round-robin-least-connections-and-consistent-hashing) — *2026-08-08 19:49*
 - [Back of the Envelope Estimation in System Design](#back-of-the-envelope-estimation-in-system-design) — *2026-08-12 02:49*
 - [Designing for Peak Load vs. Average Load: 'Performance and Capacity Design Decisions Part 4'](#designing-for-peak-load-vs-average-load-performance-and-capacity-design-decisions-part-4) — *2026-08-12 03:00*
+- [Network Partition in Distributed Systems](#network-partition-in-distributed-systems) — *2026-08-12 03:05*
 <!-- INDEX END -->
 
 ---
@@ -302,5 +303,68 @@ Mistakes often include:
 *   Conversely, underestimating the impact of daily or regular peaks.
 *   Overlooking peaks in resources other than CPU, such as I/O or network bandwidth.
 *   Not accounting for concentrated execution times, like batch jobs or concurrent user access, in the design.
+
+---
+
+## Network Partition in Distributed Systems
+
+*Added: 2026-08-12 03:05*
+
+## Overview
+A network partition in a distributed system occurs when parts of the system become isolated due to communication failures. This article explains the causes, impacts, detection methods, and strategies for handling network partitions, emphasizing their inevitability and the trade-offs involved, particularly concerning the CAP theorem.
+
+## What is a Network Partition?
+A network partition happens when a distributed system's network splits into two or more isolated groups of nodes that cannot communicate with each other. This can lead to serious issues like data inconsistencies or system unavailability.
+
+## Common Causes
+Network partitions can arise from various factors:
+*   **Hardware Failures:** Such as router crashes, damaged cables, or power outages.
+*   **Software Issues:** Including firewall misconfigurations, bugs in network protocols, or DNS failures.
+*   **Network Congestion:** High traffic loads leading to dropped packets and delays.
+*   **Geo-Distributed Systems:** Outages in cloud regions or high latency between distant data centers.
+*   **Security Attacks:** Like Distributed Denial of Service (DDoS) attacks overloading network infrastructure.
+*   **Software Updates:** Incompatible protocol versions or inconsistent service availability during rolling updates.
+*   **Natural Disasters:** Events like earthquakes or floods damaging infrastructure.
+*   **Configuration Changes:** Incorrect load balancer settings or faulty network rule updates.
+
+## Impact on Systems
+When a network partition occurs, it can severely affect a system's reliability, consistency, and availability:
+*   **Data Inconsistency:** Different isolated parts of the system may make conflicting updates.
+*   **Reduced Availability:** Critical services might become unreachable.
+*   **Increased Latency:** Rerouting traffic or retrying requests can slow down the system.
+*   **Data Loss or Overwrites:** Updates made in an isolated partition might be lost or overwritten later.
+*   **Consensus Algorithm Failure:** Protocols like Paxos or Raft may stall if they cannot reach a quorum.
+*   **Cascading Failures:** One service's failure due to partition can lead to others failing.
+*   **Split-Brain Syndrome:** Multiple partitions incorrectly assume they are the primary leader, leading to conflicting decisions.
+
+## CAP Theorem and Partitions
+The CAP theorem states that a distributed system can only guarantee two out of three properties: Consistency, Availability, and Partition Tolerance. When a network partition occurs, a system must choose between maintaining Consistency (all nodes see the same data) or Availability (every request receives a response). Systems are designed to be either CP (Consistent and Partition-tolerant) or AP (Available and Partition-tolerant).
+
+## Detection Methods
+Early detection of network partitions is vital. Common methods include:
+*   **Network Monitoring & Logging:** Using tools to track network behavior and alert on anomalies.
+*   **Heartbeat Mechanisms:** Nodes periodically send messages to confirm their availability.
+*   **Gossip Protocols:** Decentralized sharing of node health information among peers.
+*   **Consensus Protocols:** Leader-based systems detect partitions when a leader loses its quorum.
+*   **Timeout-Based Detection:** Marking nodes as unreachable if they don't respond within a set time.
+*   **Fencing Tokens & Lease Mechanisms:** Preventing split-brain by ensuring only one partition can modify data at a time.
+
+## Handling Strategies
+Designing for network partitions is crucial, and strategies depend on the system's CAP theorem trade-offs:
+*   **Quorum-Based Approaches:** Requiring a minimum number of nodes to agree on operations to maintain consistency (e.g., in CP systems).
+*   **Eventual Consistency:** Allowing temporary inconsistencies during a partition, which are resolved once the network heals (e.g., in AP systems).
+*   **Leader Election & Failover:** Ensuring a single active leader to prevent conflicting operations.
+*   **Partition Detection & Fencing:** Actively detecting partitions and preventing conflicting actions.
+*   **Multi-Region & Redundant Networks:** Distributing data and services across multiple locations to improve fault tolerance.
+*   **Graceful Degradation:** Allowing the system to operate in a limited or read-only mode during a partition.
+*   **Hybrid Approaches:** Combining strategies to balance consistency and availability based on specific business needs.
+
+## Key Principles
+*   Network partitions are an unavoidable reality in distributed systems.
+*   The CAP theorem forces a trade-off between consistency and availability during a partition.
+*   Effective detection and handling mechanisms are essential for system resilience.
+*   Preventing split-brain scenarios is critical to avoid data corruption.
+*   The choice of strategy (CP vs. AP) should align with the application's requirements.
+Ultimately, distributed systems must be designed to function reliably even when failures, such as network partitions, occur.
 
 ---
