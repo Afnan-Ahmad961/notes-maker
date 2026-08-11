@@ -12,6 +12,7 @@
 - [How DNS Works: A Guide to Understanding the Internet's Address Book](#how-dns-works-a-guide-to-understanding-the-internets-address-book) — *2026-08-08 01:40*
 - [Content Distribution Network (CDN)](#content-distribution-network-cdn) — *2026-08-08 01:57*
 - [Load Balancing Strategies: Round-Robin, Least Connections, and Consistent Hashing](#load-balancing-strategies-round-robin-least-connections-and-consistent-hashing) — *2026-08-08 19:49*
+- [Back of the Envelope Estimation in System Design](#back-of-the-envelope-estimation-in-system-design) — *2026-08-12 02:49*
 <!-- INDEX END -->
 
 ---
@@ -224,5 +225,46 @@ An advanced variant of least connections, this algorithm routes requests to the 
 ### IP Hash
 
 With IP hash, the client's IP address is used to determine which server handles the request. This ensures that requests from the same client consistently go to the same server, which is useful for maintaining session affinity without requiring the load balancer to track session state.
+
+---
+
+## Back of the Envelope Estimation in System Design
+
+*Added: 2026-08-12 02:49*
+
+**Source:** [https://www.geeksforgeeks.org/system-design/back-of-the-envelope-estimation-in-system-design/](https://www.geeksforgeeks.org/system-design/back-of-the-envelope-estimation-in-system-design/)
+
+## Overview
+Back of the Envelope (BoE) estimation is a rapid, informal technique used in system design to quickly approximate crucial system requirements like traffic, storage, bandwidth, and server needs. It helps in planning scalable and cost-effective systems by providing fast, rough calculations before detailed analysis.
+
+## What is Back of the Envelope (BoE) Estimation?
+BoE estimation involves making quick, approximate calculations using basic arithmetic, fundamental principles, and common sense. It's particularly useful in the initial stages of problem-solving or when precise figures are not yet necessary, allowing designers to jot down calculations on any available surface, hence the name.
+
+## Importance in System Design
+Estimation is vital for system design as it offers insights into feasibility, resource allocation, and overall system performance. It helps determine if a design is viable within given constraints, guides decisions on hardware and software, identifies potential risks early, predicts system performance, and serves as a basis for decision-making throughout the design process.
+
+## Key Benefits and Challenges
+**Benefits** include speed in assessment, facilitation of iterative design, early feasibility evaluation, identification of risks, improved communication among stakeholders, and assistance in resource allocation.
+
+**Challenges** involve a lack of precision, sensitivity to underlying assumptions, limited scope that might not capture full system complexity, the risk of overlooking critical factors, heavy reliance on the designer's expertise, and its unsuitability for scenarios requiring high precision.
+
+## Core Parameters for Estimation
+When performing BoE estimation, key parameters considered include performance requirements (throughput, latency), resource utilization (CPU, memory, storage), system size (users, transactions), availability, data characteristics (volume, velocity), technology stack choices, project constraints (budget, timeline), risk factors, and stakeholder expectations.
+
+## Common Techniques
+Several techniques are used for BoE estimation:
+*   **Order of Magnitude Estimation:** Approximating quantities to the nearest power of 10.
+*   **Sizing by Analogy:** Comparing the current problem to similar, known systems.
+*   **Dimensional Analysis:** Examining units of quantities to derive relationships.
+*   **Rule of Thumb:** Applying simplified guidelines or heuristics.
+*   **Back-of-the-Envelope Calculations:** Simple arithmetic with rough numbers.
+*   **Benchmarking:** Comparing against industry standards.
+*   **Expert Judgment:** Leveraging insights from domain experts.
+
+## Practical Application
+A common application is estimating bandwidth for a video streaming platform. For example, serving 10,000 concurrent users with HD video (5 Mbps each) would require an estimated 50 Gbps, which, with a 20% overhead, becomes approximately 60 Gbps. This provides a starting point for capacity planning.
+
+## Useful Tools
+Tools that aid in BoE estimation range from basic calculator apps and spreadsheet software (like Excel or Google Sheets) to online calculators, reference materials, industry standards, and even more advanced simulation software. Consulting with domain experts is also a valuable resource.
 
 ---
