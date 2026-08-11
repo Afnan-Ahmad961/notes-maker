@@ -13,6 +13,7 @@
 - [Content Distribution Network (CDN)](#content-distribution-network-cdn) — *2026-08-08 01:57*
 - [Load Balancing Strategies: Round-Robin, Least Connections, and Consistent Hashing](#load-balancing-strategies-round-robin-least-connections-and-consistent-hashing) — *2026-08-08 19:49*
 - [Back of the Envelope Estimation in System Design](#back-of-the-envelope-estimation-in-system-design) — *2026-08-12 02:49*
+- [Designing for Peak Load vs. Average Load: 'Performance and Capacity Design Decisions Part 4'](#designing-for-peak-load-vs-average-load-performance-and-capacity-design-decisions-part-4) — *2026-08-12 03:00*
 <!-- INDEX END -->
 
 ---
@@ -266,5 +267,40 @@ A common application is estimating bandwidth for a video streaming platform. For
 
 ## Useful Tools
 Tools that aid in BoE estimation range from basic calculator apps and spreadsheet software (like Excel or Google Sheets) to online calculators, reference materials, industry standards, and even more advanced simulation software. Consulting with domain experts is also a valuable resource.
+
+---
+
+## Designing for Peak Load vs. Average Load: 'Performance and Capacity Design Decisions Part 4'
+
+*Added: 2026-08-12 03:00*
+
+**Source:** [https://note.com/magic_vole6213/n/n0d6a8551c7b5?hl=en](https://note.com/magic_vole6213/n/n0d6a8551c7b5?hl=en)
+
+## Overview
+This article highlights a critical aspect of system design: the difference between designing for average load versus peak load. It argues that relying solely on average performance metrics can lead to significant issues during busy periods, emphasizing the necessity of understanding and planning for peak demands to ensure system stability and user satisfaction.
+
+## The Problem with Average Load
+Designing systems based only on average load values often masks critical performance bottlenecks. While average metrics might suggest ample capacity, systems can slow down dramatically during specific, high-stress periods like month-ends, daily starts, or batch job executions. This leads to user complaints and business impact, as average values tend to bury short, intense spikes in activity.
+
+## Understanding Average vs. Peak Load
+Average load provides a general overview of system trends and continuous margin, useful for overall optimization. In contrast, peak load reveals moments when systems are most stressed, indicating potential delays, processing drops, or complete stoppages. Effective design requires distinguishing between these two and prioritizing based on business impact. Over-provisioning for every temporary peak can be costly, while under-provisioning for critical peaks can be detrimental to business operations.
+
+## Key Actions for Design
+To address this, designers should:
+*   Identify specific time periods where delays are unacceptable.
+*   Analyze load trends by time, rather than just averages.
+*   Confirm peak values for all critical resources, including CPU, memory, I/O, and bandwidth.
+*   Determine if peaks are regular or occasional.
+*   Decide whether to absorb peaks through system design or manage them through operational adjustments like scheduling.
+*   Always monitor maximum and percentile values in addition to averages.
+
+## Common Pitfalls
+Mistakes often include:
+*   Judging capacity solely by average usage rates.
+*   Failing to identify specific peak time periods.
+*   Attempting to absorb all short-term peaks by excessively increasing infrastructure.
+*   Conversely, underestimating the impact of daily or regular peaks.
+*   Overlooking peaks in resources other than CPU, such as I/O or network bandwidth.
+*   Not accounting for concentrated execution times, like batch jobs or concurrent user access, in the design.
 
 ---
