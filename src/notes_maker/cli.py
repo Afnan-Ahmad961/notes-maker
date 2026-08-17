@@ -4,6 +4,10 @@ import questionary
 
 from . import config, extract, git_ops, notes, prompts, summarize, youtube
 
+# A transcript with at least this many words is treated as a "long" video
+# (roughly 30+ minutes of speech) and gets an in-note index of major topics.
+LONG_TRANSCRIPT_WORDS = 3500
+
 
 def _gather_source() -> tuple[str, str, str | None]:
     """Prompt for the input type and return (body_text, system_prompt, source_url)."""
@@ -36,7 +40,12 @@ def _gather_source() -> tuple[str, str, str | None]:
             print("Could not find a video id in that URL. Exiting.")
             raise SystemExit(1)
         body_text = youtube.fetch_transcript(video_id)
-        return body_text, prompts.YOUTUBE_SYSTEM_PROMPT, url
+        system_prompt = prompts.YOUTUBE_SYSTEM_PROMPT
+        word_count = len(body_text.split())
+        if word_count >= LONG_TRANSCRIPT_WORDS:
+            system_prompt += prompts.YOUTUBE_INDEX_INSTRUCTIONS
+            print(f"Long video detected ({word_count} words) — adding a topic index.")
+        return body_text, system_prompt, url
 
     body_text = extract.read_raw_text()
     return body_text, prompts.ARTICLE_SYSTEM_PROMPT, None
@@ -73,10 +82,10 @@ def main() -> None:
     notes.append_summary(target_file, title, source_url, summary)
     print(f"Summary appended to {target_file}")
 
-    # ── Step 5: git commit & push ────────────────────────────────────────
+    # ── Step 5: git commit & push (runs inside the notes/ directory) ──────
     do_git = questionary.confirm("Commit and push to Git?", default=True).ask()
     if do_git:
-        if not git_ops.commit_and_push(repo_path, target_file):
+        if not git_ops.commit_and_push(nd, target_file):
             print("\n⚠️  Git step did not complete. Your notes were saved locally.\n")
             raise SystemExit(1)
     else:

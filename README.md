@@ -53,16 +53,20 @@ To change either value later, edit that `.env` (keys: `GEMINI_API_KEY`,
 
 ### Setting up your notes repository
 
-If your notes path isn't a git repo yet, the tool runs `git init` for you on first push.
-To actually push to GitHub, add a remote once:
+All notes are written into a `notes/` subfolder of your Notes Repository Path, and **git
+operations run inside that `notes/` folder** — so that is the directory you connect to
+GitHub. The tool initializes a dedicated repo there for you on first push if one doesn't
+already exist. To point it at GitHub, add a remote once:
 
 ```bash
-cd /path/to/your/notes-repo
+cd /path/to/your/notes-repo/notes
+git init                 # if this folder isn't a git repo yet
 git remote add origin https://github.com/<you>/<your-notes-repo>.git
-git push -u origin main
 ```
 
-After that, Notes Maker's automatic `git push` works on every run.
+That's all you need to do. Let Notes Maker create the first commit and push — it sets the
+upstream branch automatically the first time (whatever your branch is named), so you don't
+have to run `git push` manually or guess between `main` and `master`.
 
 ---
 
