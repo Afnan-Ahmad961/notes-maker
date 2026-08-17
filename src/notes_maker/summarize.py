@@ -4,6 +4,7 @@ import os
 import sys
 
 from google import genai
+from google.genai import errors as genai_errors
 
 from . import config
 
@@ -18,14 +19,18 @@ def summarize(text: str, system_prompt: str) -> str:
     client = genai.Client(api_key=api_key)
 
     print("Sending to Gemini for summarization...")
-    response = client.models.generate_content(
-        model=config.MODEL,
-        contents=text,
-        config=genai.types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            temperature=0.3,
-        ),
-    )
+    try:
+        response = client.models.generate_content(
+            model=config.MODEL,
+            contents=text,
+            config=genai.types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                temperature=0.3,
+            ),
+        )
+    except genai_errors.APIError as e:
+        print(f"Gemini API error [{e.code}]: {e.message}")
+        sys.exit(1)
 
     summary = response.text
     if not summary:
