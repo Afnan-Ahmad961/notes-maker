@@ -87,8 +87,19 @@ def select_target_file(nd: Path) -> Path:
     return target
 
 
-def append_summary(path: Path, title: str, source_url: str | None, summary: str) -> None:
-    """Append a summary section to ``path`` and update its Table of Contents."""
+def append_summary(
+    path: Path,
+    title: str,
+    source_url: str | None,
+    summary: str,
+    update_index: bool = True,
+) -> None:
+    """Append a summary section to ``path``.
+
+    When ``update_index`` is True the file's Table of Contents is updated with an
+    entry for this note. It is set False for long videos, where the summary itself
+    already contains a Gemini-generated ``## Contents`` index.
+    """
     initialize_note_file(path)
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -104,6 +115,9 @@ def append_summary(path: Path, title: str, source_url: str | None, summary: str)
 
     with open(path, "a", encoding="utf-8") as f:
         f.write(new_section)
+
+    if not update_index:
+        return
 
     # ── Update the Table of Contents index ───────────────────────────────
     content = path.read_text(encoding="utf-8")

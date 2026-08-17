@@ -1,5 +1,6 @@
 """Gemini summarization call."""
 
+import logging
 import os
 import sys
 
@@ -7,6 +8,10 @@ from google import genai
 from google.genai import errors as genai_errors
 
 from . import config
+
+# The google-genai SDK emits a noisy advisory about "automatic function calling"
+# on every generate_content call. We don't use function calling, so silence it.
+logging.getLogger("google_genai").setLevel(logging.ERROR)
 
 
 def summarize(text: str, system_prompt: str) -> str:

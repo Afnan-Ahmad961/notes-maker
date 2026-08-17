@@ -5,12 +5,17 @@ import questionary
 from . import config, extract, git_ops, notes, prompts, summarize, youtube
 
 # A transcript with at least this many words is treated as a "long" video
-# (roughly 30+ minutes of speech) and gets an in-note index of major topics.
+# (roughly 30+ minutes of speech). For long videos Gemini generates the table of
+# contents and the script skips its own index; shorter videos are the reverse.
 LONG_TRANSCRIPT_WORDS = 3500
 
 
-def _gather_source() -> tuple[str, str, str | None]:
-    """Prompt for the input type and return (body_text, system_prompt, source_url)."""
+def _gather_source() -> tuple[str, str, str | None, bool]:
+    """Prompt for input and return (body_text, system_prompt, source_url, gemini_makes_toc).
+
+    ``gemini_makes_toc`` is True only for long videos, where Gemini emits the
+    ``## Contents`` index itself and the script must NOT add its own.
+    """
     input_type = questionary.select(
         "How do you want to input the source?",
         choices=["URL", "YouTube", "Raw Text"],
@@ -27,7 +32,7 @@ def _gather_source() -> tuple[str, str, str | None]:
             raise SystemExit(1)
         url = url.strip()
         _title, body_text = extract.extract_from_url(url)
-        return body_text, prompts.ARTICLE_SYSTEM_PROMPT, url
+        return body_text, prompts.ARTICLE_SYSTEM_PROMPT, url, False
 
     if input_type == "YouTube":
         url = questionary.text("Paste the YouTube video URL:").ask()
@@ -40,15 +45,17 @@ def _gather_source() -> tuple[str, str, str | None]:
             print("Could not find a video id in that URL. Exiting.")
             raise SystemExit(1)
         body_text = youtube.fetch_transcript(video_id)
-        system_prompt = prompts.YOUTUBE_SYSTEM_PROMPT
-        word_count = len(body_text.split())
-        if word_count >= LONG_TRANSCRIPT_WORDS:
-            system_prompt += prompts.YOUTUBE_INDEX_INSTRUCTIONS
-            print(f"Long video detected ({word_count} words) — adding a topic index.")
-        return body_text, system_prompt, url
+        if len(body_text.split()) >= LONG_TRANSCRIPT_WORDS:
+            # Long video: Gemini builds the table of contents.
+            print("Long video detected — Gemini will generate the table of contents.")
+            prompt = prompts.YOUTUBE_SYSTEM_PROMPT + prompts.YOUTUBE_INDEX_INSTRUCTIONS
+            return body_text, prompt, url, True
+        # Short video: the script builds the table of contents.
+        prompt = prompts.YOUTUBE_SYSTEM_PROMPT + prompts.YOUTUBE_NO_TOC_INSTRUCTIONS
+        return body_text, prompt, url, False
 
     body_text = extract.read_raw_text()
-    return body_text, prompts.ARTICLE_SYSTEM_PROMPT, None
+    return body_text, prompts.ARTICLE_SYSTEM_PROMPT, None, False
 
 
 def main() -> None:
@@ -61,7 +68,7 @@ def main() -> None:
     nd = notes.notes_dir(repo_path)
 
     # ── Step 1: gather the source ────────────────────────────────────────
-    body_text, system_prompt, source_url = _gather_source()
+    body_text, system_prompt, source_url, gemini_makes_toc = _gather_source()
     print(f"\nExtracted {len(body_text)} characters of text.")
 
     # ── Step 2: choose the destination note file ─────────────────────────
@@ -79,7 +86,11 @@ def main() -> None:
         summary = "\n".join(summary.split("\n")[1:]).strip()
 
     # ── Step 4: save to the chosen file ──────────────────────────────────
-    notes.append_summary(target_file, title, source_url, summary)
+    # For long videos Gemini already produced the table of contents, so the
+    # script skips its own index update to avoid a duplicate.
+    notes.append_summary(
+        target_file, title, source_url, summary, update_index=not gemini_makes_toc
+    )
     print(f"Summary appended to {target_file}")
 
     # ── Step 5: git commit & push (runs inside the notes/ directory) ──────
