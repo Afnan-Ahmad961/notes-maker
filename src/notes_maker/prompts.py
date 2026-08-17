@@ -33,5 +33,6 @@ Your task:
 - Use simple, easy-to-understand language and explain jargon when it first appears.
 - Prefer short paragraphs; use bullet points only where they genuinely aid clarity, and NEVER use tables.
 - Do NOT invent facts that are not supported by the transcript.
+- No matter whatever language is used, always create notes in English.
 - Output ONLY the notes in Markdown format. Do not include any preamble.
 """
