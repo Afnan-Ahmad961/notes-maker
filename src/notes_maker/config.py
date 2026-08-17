@@ -80,22 +80,31 @@ def ensure_api_key() -> str:
     return key
 
 
+def _clean_path_input(raw: str) -> str:
+    """Strip whitespace and any surrounding quotes a user may have pasted."""
+    raw = raw.strip()
+    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in ("'", '"'):
+        raw = raw[1:-1].strip()
+    return raw
+
+
 def ensure_repo_path() -> Path:
     """Return the configured notes repository path, prompting on first run."""
     raw = os.getenv(NOTES_REPO_PATH)
-    if raw and raw.strip():
-        path = Path(raw).expanduser()
+    if raw and _clean_path_input(raw):
+        path = Path(_clean_path_input(raw)).expanduser()
         path.mkdir(parents=True, exist_ok=True)
         return path
 
     print("First-time setup: choose where your notes repository lives.")
     print("Tip: point this at a git repo with a GitHub remote so notes can be pushed.")
     raw = questionary.path("Notes Repository Path:").ask()
-    if not raw or not raw.strip():
+    cleaned = _clean_path_input(raw) if raw else ""
+    if not cleaned:
         print("A notes repository path is required. Exiting.")
         raise SystemExit(1)
 
-    path = Path(raw.strip()).expanduser().resolve()
+    path = Path(cleaned).expanduser().resolve()
     path.mkdir(parents=True, exist_ok=True)
     _save(NOTES_REPO_PATH, str(path))
     print(f"Notes repository set to {path}")
