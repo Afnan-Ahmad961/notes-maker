@@ -1,13 +1,25 @@
 [project]
 name = "notes-maker"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "A CLI that turns articles and YouTube videos into indexed Markdown notes with Gemini."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 dependencies = [
     "beautifulsoup4>=4.15.0",
     "google-genai>=2.16.0",
+    "platformdirs>=4.0.0",
     "python-dotenv>=1.2.2",
     "questionary>=2.1.1",
     "requests>=2.34.2",
+    "youtube-transcript-api>=1.0.0",
 ]
+
+[project.scripts]
+notes-maker = "notes_maker.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/notes_maker"]
