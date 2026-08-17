@@ -24,12 +24,27 @@ def _run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess:
         )
 
 
+def _toplevel(repo_dir: Path) -> Path | None:
+    """Return the root of the git repo containing ``repo_dir``, or None if there is none."""
+    result = _run(["git", "rev-parse", "--show-toplevel"], repo_dir)
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    return Path(result.stdout.strip())
+
+
 def is_git_repo(repo_dir: Path) -> bool:
-    return _run(["git", "rev-parse", "--is-inside-work-tree"], repo_dir).returncode == 0
+    """True only when ``repo_dir`` is itself a git repo root (not merely inside one)."""
+    top = _toplevel(repo_dir)
+    return top is not None and top.resolve() == repo_dir.resolve()
 
 
 def ensure_git_repo(repo_dir: Path) -> bool:
-    """Ensure ``repo_dir`` is a git repo, initializing one if needed. Returns success."""
+    """Ensure ``repo_dir`` is its OWN git repo root, initializing one if needed.
+
+    If ``repo_dir`` is only nested inside a parent repo, a dedicated repo is
+    initialized here so notes commit and push to the intended remote rather than
+    being swept into the surrounding repository.
+    """
     if is_git_repo(repo_dir):
         return True
     print(f"Initializing a new git repository in {repo_dir}")
