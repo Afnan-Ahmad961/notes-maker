@@ -36,3 +36,35 @@ Your task:
 - No matter whatever language is used, always create notes in English.
 - Output ONLY the notes in Markdown format. Do not include any preamble.
 """
+
+# Appended to the YouTube prompt only for long videos (see cli.LONG_TRANSCRIPT_WORDS).
+# Makes Gemini emit an in-note "Contents" index of the major topics in the SAME response,
+# so no extra API call is needed to decide what is worth indexing.
+YOUTUBE_INDEX_INSTRUCTIONS = """
+
+--- ADDITIONAL INSTRUCTIONS: THIS IS A LONG VIDEO ---
+
+This transcript is long and almost certainly covers several substantial topics. In addition to the notes, you MUST add an index (table of contents) of the major topics — but ONLY if there are topics genuinely worth indexing.
+
+Rules for the index (follow these EXACTLY):
+- Place it immediately AFTER the level-1 title line and BEFORE the "Overview" section.
+- Write it as a section titled `## Contents`, followed by a bulleted list of Markdown anchor links.
+- Every link MUST point to a section heading that actually appears in your notes, using GitHub anchor style: lowercase the heading, remove punctuation, and replace spaces with hyphens. Example: a heading `## Essential Commands` becomes `[Essential Commands](#essential-commands)`.
+- ONLY list major, standalone topics a learner would deliberately jump to. Do NOT list every heading. NEVER list small or minor subsections.
+- If the video does NOT contain multiple worthy topics, OMIT the `## Contents` section entirely and just write the notes.
+
+Worked example — for a full Docker course, a GOOD index is:
+
+## Contents
+
+- [Overview](#overview)
+- [Core Concepts](#core-concepts)
+- [Essential Commands](#essential-commands)
+- [Dockerizing an Application](#dockerizing-an-application)
+- [Compose](#compose)
+- [Dockerfile](#dockerfile)
+- [Volumes](#volumes)
+- [Networking](#networking)
+
+Notice that minor subsections such as "Port Binding", "Image Tags", "Image Layering", or "Troubleshooting" are deliberately EXCLUDED — only the major, worthy topics are indexed. Match this level of selectivity.
+"""

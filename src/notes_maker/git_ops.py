@@ -40,6 +40,44 @@ def ensure_git_repo(repo_dir: Path) -> bool:
     return True
 
 
+def _describe(result: subprocess.CompletedProcess) -> str:
+    """Best available explanation for a failed git command (git often uses stdout)."""
+    return (
+        result.stderr.strip()
+        or result.stdout.strip()
+        or f"git exited with code {result.returncode}"
+    )
+
+
+def _current_branch(repo_dir: Path) -> str:
+    return _run(["git", "rev-parse", "--abbrev-ref", "HEAD"], repo_dir).stdout.strip() or "HEAD"
+
+
+def _push(repo_dir: Path) -> bool:
+    """Push, transparently setting the upstream on the first push of a branch."""
+    print("Running: git push")
+    result = _run(["git", "push"], repo_dir)
+
+    combined = result.stdout + result.stderr
+    if result.returncode != 0 and ("no upstream" in combined or "set-upstream" in combined):
+        branch = _current_branch(repo_dir)
+        print(f"No upstream set — retrying: git push -u origin {branch}")
+        result = _run(["git", "push", "-u", "origin", branch], repo_dir)
+        combined = result.stdout + result.stderr
+
+    if result.returncode == 0:
+        print("Changes committed and pushed successfully!")
+        return True
+
+    if "No configured push destination" in combined or "does not appear to be a git repository" in combined:
+        print("No git remote is configured for this notes repository.")
+        print("Add one and re-run, e.g.:  git remote add origin <your-repo-url>")
+    else:
+        print(f"Git error (push):\n{_describe(result)}")
+    print("Your notes are committed locally; run 'git push' once the remote is fixed.")
+    return False
+
+
 def commit_and_push(repo_dir: Path, target_file: Path) -> bool:
     """Stage the target note file, commit and push. Returns True on success."""
     if not ensure_git_repo(repo_dir):
@@ -51,28 +89,24 @@ def commit_and_push(repo_dir: Path, target_file: Path) -> bool:
     except ValueError:
         print(f"Refusing to stage {target_file}: it is outside {repo_dir}.")
         return False
+    pathspec = rel.as_posix()  # git expects forward slashes on every platform
 
-    commands = [
-        ["git", "add", str(rel)],
-        ["git", "commit", "-m", f"notes: auto-update {datetime.now().strftime('%Y-%m-%d %H:%M')}"],
-        ["git", "push"],
-    ]
+    print(f"Running: git add -- {pathspec}")
+    add = _run(["git", "add", "--", pathspec], repo_dir)
+    if add.returncode != 0:
+        print(f"Git error (add):\n{_describe(add)}")
+        return False
 
-    for cmd in commands:
-        print(f"Running: {' '.join(cmd)}")
-        result = _run(cmd, repo_dir)
-        if result.returncode != 0:
-            # `git commit` returns 1 when there's nothing to commit — that's fine.
-            if cmd[1] == "commit" and "nothing to commit" in result.stdout:
-                print("Nothing new to commit.")
-                return True
-            print(f"Git error: {result.stderr.strip()}")
-            if cmd[1] == "push":
-                print(
-                    "Push failed. Ensure a remote is configured "
-                    "(git remote add origin <url>) and run 'git push' later."
-                )
+    print("Running: git commit")
+    msg = f"notes: auto-update {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    commit = _run(["git", "commit", "-m", msg], repo_dir)
+    if commit.returncode != 0:
+        # `git commit` returns non-zero when there's nothing staged — not a failure;
+        # fall through to push so any earlier unpushed commits still sync.
+        if "nothing to commit" in (commit.stdout + commit.stderr):
+            print("Nothing new to commit.")
+        else:
+            print(f"Git error (commit):\n{_describe(commit)}")
             return False
 
-    print("Changes committed and pushed successfully!")
-    return True
+    return _push(repo_dir)
