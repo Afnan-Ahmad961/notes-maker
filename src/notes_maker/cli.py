@@ -76,7 +76,9 @@ def main() -> None:
     # ── Step 5: git commit & push ────────────────────────────────────────
     do_git = questionary.confirm("Commit and push to Git?", default=True).ask()
     if do_git:
-        git_ops.commit_and_push(repo_path)
+        if not git_ops.commit_and_push(repo_path, target_file):
+            print("\n⚠️  Git step did not complete. Your notes were saved locally.\n")
+            raise SystemExit(1)
     else:
         print("Skipping git. You can commit manually later.")
 

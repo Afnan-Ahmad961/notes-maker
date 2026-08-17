@@ -23,9 +23,13 @@ NOTES_REPO_PATH = "NOTES_REPO_PATH"
 
 
 def config_dir() -> Path:
-    """Return the global config directory, creating it if necessary."""
+    """Return the global config directory, creating it with private perms."""
     path = Path(user_config_dir(APP_NAME))
     path.mkdir(parents=True, exist_ok=True)
+    try:
+        path.chmod(0o700)
+    except OSError:
+        pass  # e.g. Windows, where POSIX modes don't fully apply
     return path
 
 
@@ -34,15 +38,26 @@ def env_path() -> Path:
     return config_dir() / ".env"
 
 
-def load() -> None:
-    """Load the global .env into the process environment (creating it if missing)."""
+def _secure_env() -> Path:
+    """Ensure the .env exists and is readable/writable only by the owner (0600)."""
     path = env_path()
     if not path.exists():
         path.touch()
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass  # e.g. Windows, where POSIX modes don't fully apply
+    return path
+
+
+def load() -> None:
+    """Load the global .env into the process environment (creating it if missing)."""
+    path = _secure_env()
     load_dotenv(path, override=True)
 
 
 def _save(key: str, value: str) -> None:
+    _secure_env()
     set_key(str(env_path()), key, value)
     os.environ[key] = value
 
