@@ -6,6 +6,30 @@ import requests
 from bs4 import BeautifulSoup
 
 _CONTENT_TAGS = ["p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "pre", "code", "blockquote"]
+_CONTENT_TAG_SET = set(_CONTENT_TAGS)
+
+
+def _collect_blocks(container) -> list:
+    """Return only the *top-level* content blocks inside ``container``.
+
+    ``find_all`` matches parents and their descendants alike, so a
+    ``<pre><code>…`` or a ``<li><p>…`` would otherwise have its text collected
+    twice. We keep a matched tag only when none of its ancestors (up to, but not
+    including, ``container``) is itself a content tag — the ancestor's text
+    already covers the nested one.
+    """
+    blocks = []
+    for tag in container.find_all(_CONTENT_TAGS):
+        nested = False
+        for parent in tag.parents:
+            if parent is container:
+                break
+            if parent.name in _CONTENT_TAG_SET:
+                nested = True
+                break
+        if not nested:
+            blocks.append(tag)
+    return blocks
 
 
 def extract_from_url(url: str) -> tuple[str, str]:
@@ -40,15 +64,13 @@ def extract_from_url(url: str) -> tuple[str, str]:
             seen_titles.add(t_text)
 
     # Prefer <article>, then <main>/<body>, then a bare <p> sweep.
-    article = soup.find("article")
-    if article:
-        paragraphs = article.find_all(_CONTENT_TAGS)
-    else:
-        main = soup.find("main") or soup.find("body")
-        paragraphs = main.find_all(_CONTENT_TAGS) if main else soup.find_all("p")
+    container = soup.find("article") or soup.find("main") or soup.find("body")
+    blocks = _collect_blocks(container) if container else soup.find_all("p")
 
+    # ``separator=" "`` keeps a space between inline children (e.g. a <code> span
+    # inside a <p>), so words don't run together like "Item withinlinecode".
     body_text = "\n\n".join(
-        tag.get_text(strip=True) for tag in paragraphs if tag.get_text(strip=True)
+        text for tag in blocks if (text := tag.get_text(separator=" ", strip=True))
     )
 
     if not body_text:
