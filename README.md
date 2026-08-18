@@ -7,6 +7,11 @@ notes repository.
 Give it a link, pick (or create) a note file, and it drops a titled, timestamped summary
 into your notes and keeps a linked Table of Contents up to date.
 
+> **Not a developer?** No problem — follow the step-by-step, jargon-free
+> **[Non-technical setup guide](Non-technical-guide.md)** instead. It walks you through
+> everything (installing the tools, getting a free AI key, optional online backup, and daily
+> use) assuming no programming experience.
+
 ---
 
 ## Installation
