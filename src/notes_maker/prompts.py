@@ -71,23 +71,24 @@ YOUTUBE_INDEX_INSTRUCTIONS = """
 This transcript is long and almost certainly covers several substantial topics. You MUST add an index (table of contents) of the major topics.
 
 Rules for the index (follow these EXACTLY):
-- Place it immediately AFTER the level-1 title line and BEFORE the `## Overview` section.
+- Place the `## Contents` section immediately AFTER the level-1 title line and BEFORE your first content section (the prefixed Overview described below).
 - Write it as a section titled `## Contents`, followed by a bulleted list of Markdown anchor links.
-- Every link MUST point to a section heading that actually appears in your notes, using GitHub anchor style: lowercase the heading, remove punctuation, and replace spaces with hyphens. Example: a heading `## Essential Commands` becomes `[Essential Commands](#essential-commands)`.
+- IMPORTANT — these notes will be APPENDED into a file that may already contain other notes whose headings are identical (for example another video's `## Overview`). Duplicate headings produce clashing anchors, which would make your links jump to the wrong section. To keep every anchor unique, prefix the video's title onto EVERY `##` and `###` heading you write (including the Overview section), and build each anchor link from that same prefixed heading so headings and links always match. Use the form `## <Title>: <Section>` for headings and `[<Section>](#<title>-<section>)` for links.
+- Anchors use GitHub style: lowercase the full prefixed heading, remove punctuation (the `:` disappears), and replace spaces with hyphens. Example, for a video titled `Docker`: the heading `## Docker: Essential Commands` is linked as `[Essential Commands](#docker-essential-commands)`.
 - ONLY list major, standalone topics a learner would deliberately jump to. Do NOT list every heading. NEVER list small or minor subsections.
 
-Worked example — for a full Docker course, a GOOD index is:
+Worked example — for a full Docker course (video titled `Docker`), a GOOD index is:
 
 ## Contents
 
-- [Overview](#overview)
-- [Core Concepts](#core-concepts)
-- [Essential Commands](#essential-commands)
-- [Dockerizing an Application](#dockerizing-an-application)
-- [Compose](#compose)
-- [Dockerfile](#dockerfile)
-- [Volumes](#volumes)
-- [Networking](#networking)
+- [Overview](#docker-overview)
+- [Core Concepts](#docker-core-concepts)
+- [Essential Commands](#docker-essential-commands)
+- [Dockerizing an Application](#docker-dockerizing-an-application)
+- [Compose](#docker-compose)
+- [Dockerfile](#docker-dockerfile)
+- [Volumes](#docker-volumes)
+- [Networking](#docker-networking)
 
 Notice that minor subsections such as "Port Binding", "Image Tags", "Image Layering", or "Troubleshooting" are deliberately EXCLUDED — only the major, worthy topics are indexed. Match this level of selectivity.
 """
